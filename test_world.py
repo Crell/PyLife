@@ -1,17 +1,45 @@
 import unittest
+import pytest
 
 import world
 
-class TesteOrganism(unittest.TestCase):
-    def test_is_alive(self):
-        default = world.Organism()
-        self.assertTrue(default.isAlive())
 
-        dead = world.Organism(False)
-        self.assertFalse(dead.isAlive())
+neighborTestData = [
+    [[world.Organism(True)], False]
 
-        alive = world.Organism(True)
-        self.assertTrue(alive.isAlive())
+]
+
+# Organism tests
+
+
+def test_is_alive():
+    default = world.Organism()
+    assert default.isAlive()
+
+    dead = world.Organism(False)
+    assert not dead.isAlive()
+
+    alive = world.Organism(True)
+    assert alive.isAlive()
+
+
+@pytest.mark.parametrize("start,neighbors,expected",  [
+    (False, [world.Organism(True)], False),
+    (False, [world.Organism(False)], False),
+    (False, [world.Organism(False), world.Organism(True)], False),
+    (False, [world.Organism(False), world.Organism(True)], False),
+    (False, [world.Organism(True), world.Organism(True)], False),
+    (False, [world.Organism(True), world.Organism(True)], False),
+    (True, [world.Organism(True), world.Organism(True)], True),
+    (False, [world.Organism(True), world.Organism(True), world.Organism(True)], True),
+    (True, [world.Organism(True), world.Organism(True), world.Organism(True), world.Organism(True)], False),
+])
+def test_update_value(start, neighbors, expected):
+        o = world.Organism(start)
+
+        o.setSourceNeighbors(neighbors)
+        o.updateValue()
+        assert expected == o.isAlive()
 
 
 class TestWorld(unittest.TestCase):
@@ -40,6 +68,23 @@ class TestWorld(unittest.TestCase):
         self.assertTrue(w.cellAt(2, 3).isAlive())
         self.assertFalse(w.cellAt(1, 1).isAlive())
         self.assertTrue(w.cellAt(5, 10).isAlive())
+
+    def test_step(self):
+        w = world.World(5, 10)
+        w.placeOrganism(2, 2).placeOrganism(2, 3).placeOrganism(2, 4)
+        w.step()
+
+        # Two cells should have died
+        self.assertFalse(w.cellAt(2, 2).isAlive())
+        self.assertFalse(w.cellAt(2, 4).isAlive())
+
+        # Two cells should be born
+        self.assertTrue(w.cellAt(1, 3).isAlive())
+        self.assertTrue(w.cellAt(3, 3).isAlive())
+
+        # One cell doesn't change
+        self.assertTrue(w.cellAt(2, 3).isAlive())
+
 
 if __name__ == '__main__':
     unittest.main()
