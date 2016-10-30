@@ -1,16 +1,16 @@
 
 import copy
 
-
-# @todo Make organism and Rock a subclass of Thing, or something, so that Cells don't need to be regenerated and can just hold a Thing.
-
 class Cell:
     neighbors = []
 
     occupant = None
+    mirrorCell = None
 
-    def __init__(self, occupant = None):
-        self.occupant = occupant or Occupant()
+    def __init__(self, occupant = None, mirror = None):
+        # Default to a dead organism
+        self.occupant = occupant or Organism(False)
+        self.mirrorCell = mirror
 
     def isAlive(self):
         return self.occupant.isAlive()
@@ -18,16 +18,20 @@ class Cell:
     def setOccupant(self, occupant):
         self.occupant = occupant
 
+    def setMirrorCell(self, cell):
+        self.mirrorCell = cell
+
     def setSourceNeighbors(self, cells):
         self.neighbors = cells
 
     def updateValue(self):
         numLiving = len([n for n in self.neighbors if n.isAlive()])
+
         # Each cell with one or no neighbors dies, as if by solitude.
         # Each cell with four or more neighbors dies, as if by overpopulation.
         # Each cell with two or three neighbors survives.
 
-        self.occupant.setAlive((numLiving == 3) or (numLiving == 2 and self.isAlive()))
+        self.occupant.setAlive((numLiving == 3) or (numLiving == 2 and self.mirrorCell.isAlive()))
 
     def __str__(self):
         return str(self.occupant)
@@ -80,6 +84,13 @@ class World:
         self.setGridSourceNeighbors(self.grid[0], self.grid[1])
         self.setGridSourceNeighbors(self.grid[1], self.grid[0])
 
+        self.setGridMirrors(self.grid[0], self.grid[1])
+        self.setGridMirrors(self.grid[1], self.grid[0])
+
+    def setGridMirrors(self, source, target):
+        for (x, y), cell, in source.iteritems():
+            cell.setMirrorCell(target[(x, y)])
+
     def setGridSourceNeighbors(self, grid, target):
         for (x, y), cell, in grid.iteritems():
             cell.setSourceNeighbors(self.getCellNeighbors(target, x, y))
@@ -118,7 +129,9 @@ class World:
         nextGrid = self.grid[nextCurrent]
         # @todo Turn this into a map call if possible.
         for coord, cell in nextGrid.iteritems():
+            #print coord, "Before: " + str(cell)
             cell.updateValue()
+            #print coord, "After: " + str(cell)
 
         self.current = nextCurrent
         return
@@ -132,8 +145,18 @@ class World:
         return grid
 
     def __str__(self):
+        # out = ''
+        # for idx, g in self.grid.iteritems():
+        #     out += 'On grid ' + str(idx) + ':\n'
+        #     for x in range(self.rows):
+        #         for y in range(self.cols):
+        #             out += str(g[(x, y)])
+        #     out += '\n'
+        # return out
+
         grid = self.activeGrid()
-        out = 'On grid ' + str(self.current) + ':\n'
+        out =''
+        out += 'On grid ' + str(self.current) + ':\n'
         for x in range(self.rows):
             for y in range(self.cols):
                 out += str(grid[(x, y)])
@@ -143,15 +166,14 @@ class World:
 if __name__ == '__main__':
 
     w = World(3, 3)
+    w.placeOrganism(0, 1).placeOrganism(1, 1).placeOrganism(2, 1)
 
-    assert len(w.getCellNeighbors(w.grid[1], 0, 0)) == 3
-
-    #print w.grid[0][(1, 1)].occupant
-    assert isinstance(w.grid[0][(1, 1)].occupant, Occupant)
-
-    w = World(5, 10)
-    w.placeOrganism(2, 2).placeOrganism(2, 3).placeOrganism(2, 4)
-
+    print w
+    w.step()
+    print w
+    w.step()
+    print w
+    w.step()
     print w
     w.step()
     print w

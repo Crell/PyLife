@@ -29,11 +29,12 @@ def test_is_alive():
     (True, [world.Cell(world.Organism(True)), world.Cell(world.Organism(True)), world.Cell(world.Organism(True)), world.Cell(world.Organism(True))], False),
 ])
 def test_update_value(start, neighbors, expected):
-        o = world.Cell(world.Organism(start))
+        # The state of the local organism doesn't matter, it's the mirror organism that matters.
+        c = world.Cell(None, world.Organism(start))
 
-        o.setSourceNeighbors(neighbors)
-        o.updateValue()
-        assert expected == o.isAlive()
+        c.setSourceNeighbors(neighbors)
+        c.updateValue()
+        assert expected == c.isAlive()
 
 
 # World tests
@@ -43,12 +44,8 @@ def test_create_world():
     assert isinstance(w.grid, dict)
     assert isinstance(w.grid[0], dict)
     assert isinstance(w.grid[1], dict)
-
     assert isinstance(w.grid[0][(1, 1)], world.Cell)
-
-    # This line works in an in-code test, but fails here. But without being able to print from the test
-    # (-s isn't working) I don't know why.
-    # assert isinstance(w.grid[0][(1, 1)].occupant, world.Organism)
+    assert isinstance(w.grid[0][(1, 1)].occupant, world.Organism)
 
 
 def test_populateRocks():
@@ -86,7 +83,7 @@ def test_get_cell_neighbors():
     assert len(w.getCellNeighbors(w.grid[1], 2, 2)) == 3
 
 
-"""
+
 def test_step():
     w = world.World(5, 10)
     w.placeOrganism(2, 2)\
@@ -104,7 +101,7 @@ def test_step():
 
     # One cell doesn't change
     assert w.cellAt(2, 3).isAlive()
-"""
+
 
 if __name__ == '__main__':
     unittest.main()
