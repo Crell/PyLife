@@ -1,6 +1,50 @@
 
 import copy
 
+"""
+Needed refactor notes:
+
+Occupants:
+- Food
+- Rock
+- Empty (Changeable)
+- Friend (Changeable)
+- Enemy (Changeable)
+
+Living cell survives if:
+(friends + enemies) < 4
+friends+food >=2
+
+Cell is born if:
+friends + food = 3
+
+
+
+addSpecies(1, Species())
+place(s, 2, 3)
+
+addType('R', Rock())
+addType('F', Food())
+addType('0', Empty())
+addType('1', Organism())
+addType('2', Organism())
+place('R', 2, 4)
+
+if occupant.changeable:
+    if organism:
+        neighbors = getNeighbors
+        friends = neighbors if same ID
+        enemies = neighbors if same type, different ID
+        if (friends+enemies < 4 and friends+food >=2):
+            change to empty
+    if empty:
+        neighbors = getNeighbors
+        if (neighbors of same species or food) = 3 and neighbors < 4
+            change to species X
+
+
+"""
+
 class Cell:
     neighbors = []
 
