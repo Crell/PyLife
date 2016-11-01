@@ -43,7 +43,7 @@ def test_create_world():
     assert w.grid[0][(1, 1)].state == 'E'
 
 
-def test_populateRocks():
+def test_populate_rocks():
     w = world.World(5, 10)
 
     w.place('R', (2, 3))
@@ -57,7 +57,7 @@ def test_populateRocks():
     assert w.cellAt((4, 4)).state == 'E'
 
 
-def test_populateOrganisms():
+def test_populate_organisms():
     w = world.World(5, 10)
     w.place('1', (2, 3)) \
         .place('1', (4, 9))
