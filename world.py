@@ -1,5 +1,6 @@
 
 import copy
+import operator
 
 """
 Needed refactor notes:
@@ -51,63 +52,78 @@ class Cell:
     occupant = None
     mirrorCell = None
 
-    def __init__(self, occupant = None, mirror = None):
-        # Default to a dead organism
-        self.occupant = occupant or Organism(False)
+    # In Python 3.4 we'd use an Enum here
+    state = 'E'
+
+    def __init__(self, state = 'E', mirror = None):
+        self.state = state
         self.mirrorCell = mirror
 
     def isAlive(self):
-        return self.occupant.isAlive()
+        return isinstance(self.state, (int, long))
 
-    def setOccupant(self, occupant):
-        self.occupant = occupant
+    def setState(self, state):
+        self.state = state
+        return self
 
     def setMirrorCell(self, cell):
         self.mirrorCell = cell
+        return self
 
     def setSourceNeighbors(self, cells):
         self.neighbors = cells
+        return self
 
     def updateValue(self):
-        numLiving = len([n for n in self.neighbors if n.isAlive()])
+        # The current state is actually the state of the mirror cell, since that determines
+        # whether we may die or may be born.
+        currentState = self.mirrorCell.state
 
-        # Each cell with one or no neighbors dies, as if by solitude.
-        # Each cell with four or more neighbors dies, as if by overpopulation.
-        # Each cell with two or three neighbors survives.
+        # Rocks and Food never change.
+        if currentState in ['R', 'F']: return self
 
-        self.occupant.setAlive((numLiving == 3) or (numLiving == 2 and self.mirrorCell.isAlive()))
+        # Precompute the neighborStates for performance.
+        neighborStates = map(str, self.neighbors)
+        counts = {item: neighborStates.count(item) for item in neighborStates}
+
+        # Ensure certain keys are mentionedso there's no missing key error later.
+        for key in ['F', 'R', 'E']:
+            if not key in counts:
+                counts[key] = 0
+
+        liveNeighbors = len([n for n in self.neighbors if n.state.isdigit()])
+
+        # Living cell survives if:
+        # (friends + enemies) < 4
+        # friends+food >=2
+        #
+        # Cell is born if:
+        # friends + food = 3
+
+        #print "Neighbors: " + str(liveNeighbors)
+        #print "Food: " + str(counts['F'])
+
+
+        # print "Current state", currentState, currentState.isdigit()
+        # print "Neighbors", liveNeighbors, liveNeighbors >= 4
+        # print (counts[currentState] + counts['F']) < 2
+        # print currentState.isdigit() and (liveNeighbors >= 4 or (counts[currentState] + counts['F']) < 2)
+        # print liveNeighbors in range(1, 4)
+        # print liveNeighbors + counts['F'] >=3
+
+        # See if a cell should be born.
+        if currentState == 'E' and liveNeighbors in range(1, 4) and liveNeighbors + counts['F'] >=3:
+            print "Are we here"
+            speciesCounts = {species: counts[species] for species in counts if species.isdigit()}
+            self.state = max(speciesCounts.iteritems(), key=operator.itemgetter(1))[0]
+        # Otherwise, see if it dies.
+        elif currentState.isdigit() and (liveNeighbors >= 4 or (counts[currentState] + counts['F']) < 2):
+                self.state = 'E'
+        else:
+            self.state = currentState
 
     def __str__(self):
-        return str(self.occupant)
-
-
-class Occupant:
-    def isAlive(self):
-        return False
-
-    def setAlive(self, living): pass
-
-    def __str__(self):
-        return 'A' if self.isAlive() else 'D'
-
-
-class Organism(Occupant):
-    living = False
-
-    def __init__(self, live=True):
-        self.living = live
-
-    def isAlive(self):
-        return self.living
-
-    def setAlive(self, living):
-        self.living = living
-
-
-class Rock(Occupant):
-
-    def __str__(self):
-        return 'R'
+        return self.state
 
 
 class World:
@@ -143,8 +159,6 @@ class World:
         x_range = range(max(x-1, 0), min(x+1, self.rows-1)+1)
         y_range = range(max(y-1, 0), min(y+1, self.cols-1)+1)
 
-        #print x, max(x-1, 0), min(x+1, self.rows)+1, x_range
-
         neighbors = [target[(i, j)]
                      for i in x_range
                      for j in y_range
@@ -154,18 +168,19 @@ class World:
     def activeGrid(self):
         return self.grid[self.current]
 
+    def inactiveGrid(self):
+        return self.grid[(self.current + 1) % 2]
+
     def cellAt(self, x, y):
         active = self.activeGrid()
-        return active[(x, y)].occupant
+        return active[(x, y)]
 
-    def placeRock(self, x, y):
-        cell = self.activeGrid()[(x, y)]
-        cell.setOccupant(Rock())
-        return self
+    def place(self, state, x, y):
+        cell = self.activeGrid()[(x, y)].setState(state)
+        # Food and Rocks are persistent, so set them on both grids.
+        if state in ['F', 'R']:
+            self.inactiveGrid()[(x, y)].setState(state)
 
-    def placeOrganism(self, x, y, org = None):
-        org = org or Organism()
-        self.activeGrid()[(x, y)].setOccupant(org)
         return self
 
     def step(self):
@@ -173,9 +188,7 @@ class World:
         nextGrid = self.grid[nextCurrent]
         # @todo Turn this into a map call if possible.
         for coord, cell in nextGrid.iteritems():
-            #print coord, "Before: " + str(cell)
             cell.updateValue()
-            #print coord, "After: " + str(cell)
 
         self.current = nextCurrent
         return
@@ -208,17 +221,4 @@ class World:
         return out
 
 if __name__ == '__main__':
-
-    w = World(3, 3)
-    w.placeOrganism(0, 1).placeOrganism(1, 1).placeOrganism(2, 1)
-
-    print w
-    w.step()
-    print w
-    w.step()
-    print w
-    w.step()
-    print w
-    w.step()
-    print w
-
+    pass
