@@ -24,8 +24,6 @@ friends + food = 3
 class Cell(object):
     neighbors = []
 
-    occupant = None
-
     def __init__(self, state = 'E', mirror = None):
         self._state = state
         self.mirrorCell = mirror
@@ -72,7 +70,7 @@ class Cell(object):
         liveNeighbors = len([n for n in self.neighbors if n.state.isdigit()])
 
         # See if a cell should be born.
-        if currentState == 'E' and liveNeighbors in range(1, 4) and liveNeighbors + counts['F'] >=3:
+        if currentState == 'E' and liveNeighbors in xrange(1, 4) and liveNeighbors + counts['F'] >=3:
             speciesCounts = {species: counts[species] for species in counts if species.isdigit()}
             candidateState = max(speciesCounts.iteritems(), key=operator.itemgetter(1))[0]
             if (speciesCounts[candidateState] + counts['F']) >= 3:
@@ -120,8 +118,8 @@ class World(object):
 
     def getCellNeighbors(self, target, coord):
         x, y = coord
-        x_range = range(max(x-1, 0), min(x+1, self.rows-1)+1)
-        y_range = range(max(y-1, 0), min(y+1, self.cols-1)+1)
+        x_range = xrange(max(x-1, 0), min(x+1, self.rows-1)+1)
+        y_range = xrange(max(y-1, 0), min(y+1, self.cols-1)+1)
 
         neighbors = [target[(i, j)]
                      for i in x_range
@@ -160,8 +158,8 @@ class World(object):
     def newgrid(self, rows, cols):
         grid = {}
         # @todo There is probably a comprehension version of this.
-        for r in range(0, rows):
-            for c in range(0, cols):
+        for r in xrange(0, rows):
+            for c in xrange(0, cols):
                 grid[(r, c)] = Cell()
         return grid
 
@@ -169,8 +167,8 @@ class World(object):
         grid = self.activeGrid()
         out = ''
         out += 'On grid ' + str(self.current) + ':\n'
-        for x in range(self.rows):
-            for y in range(self.cols):
+        for x in xrange(self.rows):
+            for y in xrange(self.cols):
                 out += str(grid[(x, y)])
             out += '\n'
         return out
