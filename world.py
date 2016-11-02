@@ -104,18 +104,12 @@ class World(object):
         self.grid[0] = copy.deepcopy(grid)
         self.grid[1] = copy.deepcopy(grid)
 
-        self.setGridSourceNeighbors(self.grid[0], self.grid[1])
-        self.setGridSourceNeighbors(self.grid[1], self.grid[0])
+        self.setGridSources(self.grid[0], self.grid[1])
+        self.setGridSources(self.grid[1], self.grid[0])
 
-        self.setGridMirrors(self.grid[0], self.grid[1])
-        self.setGridMirrors(self.grid[1], self.grid[0])
-
-    def setGridMirrors(self, source, target):
-        for (x, y), cell, in source.iteritems():
-            cell.mirrorCell = target[(x, y)]
-
-    def setGridSourceNeighbors(self, grid, target):
+    def setGridSources(self, grid, target):
         for (x, y), cell, in grid.iteritems():
+            cell.mirrorCell = target[(x, y)]
             cell.setSourceNeighbors(self.getCellNeighbors(target, (x, y)))
 
     def getCellNeighbors(self, target, coord):
