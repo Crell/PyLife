@@ -123,21 +123,5 @@ def test_step_with_food_and_rocks():
 
 
 
-"""
-
-def test_step_with_rocks():
-    w = world.World(5, 10)
-
-    w.place('1', (2, 2)) \
-        .place('1', (2, 3)) \
-        .place('1', (2, 4)) \
-        .place('R', (4, 7))
-
-
-    w.step()
-
-    assert isinstance(w.cellAt((4, 7)), world.Rock)
-"""
-
 if __name__ == '__main__':
     unittest.main()

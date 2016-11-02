@@ -95,23 +95,6 @@ class Cell:
 
         liveNeighbors = len([n for n in self.neighbors if n.state.isdigit()])
 
-        # Living cell survives if:
-        # (friends + enemies) < 4
-        # friends+food >=2
-        #
-        # Cell is born if:
-        # friends + food = 3
-
-        # print "Neighbors: " + str(liveNeighbors)
-        # print "Food: " + str(counts['F'])
-
-        # print "Current state", currentState, currentState.isdigit()
-        # print "Neighbors", liveNeighbors, liveNeighbors >= 4
-        # print (counts[currentState] + counts['F']) < 2
-        # print currentState.isdigit() and (liveNeighbors >= 4 or (counts[currentState] + counts['F']) < 2)
-        # print liveNeighbors in range(1, 4)
-        # print liveNeighbors + counts['F'] >=3
-
         # See if a cell should be born.
         if currentState == 'E' and liveNeighbors in range(1, 4) and liveNeighbors + counts['F'] >=3:
             speciesCounts = {species: counts[species] for species in counts if species.isdigit()}
@@ -206,15 +189,6 @@ class World:
         return grid
 
     def __str__(self):
-        # out = ''
-        # for idx, g in self.grid.iteritems():
-        #     out += 'On grid ' + str(idx) + ':\n'
-        #     for x in range(self.rows):
-        #         for y in range(self.cols):
-        #             out += str(g[(x, y)])
-        #     out += '\n'
-        # return out
-
         grid = self.activeGrid()
         out =''
         out += 'On grid ' + str(self.current) + ':\n'
