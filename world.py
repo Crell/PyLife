@@ -166,12 +166,13 @@ class World(object):
     def __str__(self):
         grid = self.activeGrid()
         out = ''
-        out += 'On grid ' + str(self.current) + ':\n'
+        out += 'On grid {}:\n'.format(self.current)
         for x in xrange(self.rows):
             for y in xrange(self.cols):
                 out += str(grid[(x, y)])
             out += '\n'
         return out
+
 
 if __name__ == '__main__':
 
