@@ -59,7 +59,7 @@ class Cell(object):
             return self
 
         # Precompute the neighborStates for performance.
-        neighborStates = map(str, self.neighbors)
+        neighborStates = [str(n) for n in self.neighbors]
         counts = {item: neighborStates.count(item) for item in neighborStates}
 
         # Ensure certain keys are mentioned so there's no missing key error later.
