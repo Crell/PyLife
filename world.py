@@ -25,18 +25,26 @@ class Cell(object):
     neighbors = []
 
     occupant = None
-    mirrorCell = None
-
-    # In Python 3.4 we'd use an Enum here
-    state = 'E'
 
     def __init__(self, state = 'E', mirror = None):
-        self.state = state
+        self._state = state
         self.mirrorCell = mirror
 
-    def setMirrorCell(self, cell):
-        self.mirrorCell = cell
-        return self
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, state):
+        self._state = state
+
+    @property
+    def mirrorCell(self):
+        return self._mirror_cell
+
+    @mirrorCell.setter
+    def mirrorCell(self, cell):
+        self._mirror_cell = cell
 
     def setSourceNeighbors(self, cells):
         self.neighbors = cells
@@ -104,7 +112,7 @@ class World(object):
 
     def setGridMirrors(self, source, target):
         for (x, y), cell, in source.iteritems():
-            cell.setMirrorCell(target[(x, y)])
+            cell.mirrorCell = target[(x, y)]
 
     def setGridSourceNeighbors(self, grid, target):
         for (x, y), cell, in grid.iteritems():
