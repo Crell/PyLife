@@ -59,10 +59,6 @@ class Cell:
         self.state = state
         self.mirrorCell = mirror
 
-    def setState(self, state):
-        self.state = state
-        return self
-
     def setMirrorCell(self, cell):
         self.mirrorCell = cell
         return self
@@ -162,10 +158,10 @@ class World:
         return active[coord]
 
     def place(self, state, coord):
-        cell = self.activeGrid()[coord].setState(state)
+        cell = self.activeGrid()[coord].state = state
         # Food and Rocks are persistent, so set them on both grids.
         if state in ['F', 'R']:
-            self.inactiveGrid()[coord].setState(state)
+            self.inactiveGrid()[coord].state = state
 
         return self
 
