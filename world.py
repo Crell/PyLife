@@ -21,7 +21,7 @@ friends + food = 3
 
 """
 
-class Cell:
+class Cell(object):
     neighbors = []
 
     occupant = None
@@ -81,7 +81,7 @@ class Cell:
         return self.state
 
 
-class World:
+class World(object):
 
     grid = dict()
     current = 0
