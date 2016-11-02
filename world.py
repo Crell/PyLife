@@ -129,41 +129,39 @@ class World(object):
                      if not (i == x and j == y)]
         return neighbors
 
+    @property
     def activeGrid(self):
         return self.grid[self.current]
 
+    @property
     def inactiveGrid(self):
         return self.grid[(self.current + 1) % 2]
 
     def cellAt(self, coord):
-        active = self.activeGrid()
-        return active[coord]
+        return self.activeGrid[coord]
 
     def place(self, state, coord):
-        cell = self.activeGrid()[coord].state = state
+        self.activeGrid[coord].state = state
         # Food and Rocks are persistent, so set them on both grids.
         if state in ['F', 'R']:
-            self.inactiveGrid()[coord].state = state
+            self.inactiveGrid[coord].state = state
 
         return self
 
     def step(self):
-        nextCurrent = (self.current + 1) % 2
-        nextGrid = self.grid[nextCurrent]
         # @todo Turn this into a map call if possible.
-        for coord, cell in nextGrid.iteritems():
+        for coord, cell in self.inactiveGrid.iteritems():
             cell.updateValue()
 
-        self.current = nextCurrent
+        self.current = (self.current + 1) % 2
         return
 
     def __str__(self):
-        grid = self.activeGrid()
         out = ''
         out += 'On grid {}:\n'.format(self.current)
         for x in xrange(self.rows):
             for y in xrange(self.cols):
-                out += str(grid[(x, y)])
+                out += str(self.activeGrid[(x, y)])
             out += '\n'
         return out
 
