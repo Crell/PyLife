@@ -120,14 +120,10 @@ class World(object):
 
     def getCellNeighbors(self, target, coord):
         x, y = coord
-        x_range = xrange(max(x-1, 0), min(x+1, self.rows-1)+1)
-        y_range = xrange(max(y-1, 0), min(y+1, self.cols-1)+1)
-
-        neighbors = [target[(i, j)]
-                     for i in x_range
-                     for j in y_range
+        return [target[(i, j)]
+                     for i in xrange(max(x-1, 0), min(x+1, self.rows-1)+1)
+                     for j in xrange(max(y-1, 0), min(y+1, self.cols-1)+1)
                      if not (i == x and j == y)]
-        return neighbors
 
     @property
     def activeGrid(self):
