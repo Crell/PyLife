@@ -59,9 +59,6 @@ class Cell:
         self.state = state
         self.mirrorCell = mirror
 
-    def isAlive(self):
-        return isinstance(self.state, (int, long))
-
     def setState(self, state):
         self.state = state
         return self
