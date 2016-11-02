@@ -22,6 +22,7 @@ import world
     ('1', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('F')], '1'),
     ('R', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('R')], 'R'),
     ('F', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('R')], 'F'),
+    ('E', [world.Cell('1'), world.Cell('2'), world.Cell('1'), world.Cell('R')], 'E'),
 ])
 def test_update_value(start, neighbors, expected):
         # The state of the local cell doesn't matter, it's the mirror cell that matters.
@@ -120,6 +121,25 @@ def test_step_with_food_and_rocks():
 
     # One cell should be born.
     assert w.cellAt((1, 3)).state == '1'
+
+
+def test_step_multiplayer():
+    w = world.World(5, 10)
+    w.place('1', (2, 2)) \
+        .place('2', (2, 3)) \
+        .place('1', (2, 4))
+    w.step()
+
+    print w
+
+    # Because they're different species, everyone should have died.
+    assert w.cellAt((2, 2)).state == 'E'
+    assert w.cellAt((2, 4)).state == 'E'
+    assert w.cellAt((2, 3)).state == 'E'
+
+    # No one should be born.
+    assert w.cellAt((1, 3)).state == 'E'
+    assert w.cellAt((3, 3)).state == 'E'
 
 
 

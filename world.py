@@ -98,7 +98,9 @@ class Cell:
         # See if a cell should be born.
         if currentState == 'E' and liveNeighbors in range(1, 4) and liveNeighbors + counts['F'] >=3:
             speciesCounts = {species: counts[species] for species in counts if species.isdigit()}
-            self.state = max(speciesCounts.iteritems(), key=operator.itemgetter(1))[0]
+            candidateState = max(speciesCounts.iteritems(), key=operator.itemgetter(1))[0]
+            if (speciesCounts[candidateState] + counts['F']) >= 3:
+                self.state = candidateState
         # Otherwise, see if it dies.
         elif currentState.isdigit() and (liveNeighbors >= 4 or (counts[currentState] + counts['F']) < 2):
                 self.state = 'E'
@@ -200,9 +202,14 @@ class World:
 
 if __name__ == '__main__':
 
-    c = Cell('E', Cell('R'))
+    w = World(5, 10)
+    w.place('1', (2, 2)) \
+        .place('2', (2, 3)) \
+        .place('1', (2, 4))
 
-    c.setSourceNeighbors([Cell('1'), Cell('1'), Cell('1'), Cell('R')])
-    c.updateValue()
+    w.step()
 
-    assert 'R' == c.state
+    print w
+
+    # No one should be born.
+    assert w.cellAt((1, 3)).state == 'E'
