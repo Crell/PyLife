@@ -3,14 +3,14 @@ import copy
 import operator
 
 """
-Needed refactor notes:
 
 Occupants:
-- Food
-- Rock
-- Empty (Changeable)
-- Friend (Changeable)
-- Enemy (Changeable)
+- F: Food
+- R: Rock
+- E: Empty (Changeable)
+- Digit: A player, each species is a different digit
+
+Rules:
 
 Living cell survives if:
 (friends + enemies) < 4
@@ -18,31 +18,6 @@ friends+food >=2
 
 Cell is born if:
 friends + food = 3
-
-
-
-addSpecies(1, Species())
-place(s, 2, 3)
-
-addType('R', Rock())
-addType('F', Food())
-addType('0', Empty())
-addType('1', Organism())
-addType('2', Organism())
-place('R', 2, 4)
-
-if occupant.changeable:
-    if organism:
-        neighbors = getNeighbors
-        friends = neighbors if same ID
-        enemies = neighbors if same type, different ID
-        if (friends+enemies < 4 and friends+food >=2):
-            change to empty
-    if empty:
-        neighbors = getNeighbors
-        if (neighbors of same species or food) = 3 and neighbors < 4
-            change to species X
-
 
 """
 
@@ -185,7 +160,7 @@ class World:
 
     def __str__(self):
         grid = self.activeGrid()
-        out =''
+        out = ''
         out += 'On grid ' + str(self.current) + ':\n'
         for x in range(self.rows):
             for y in range(self.cols):
