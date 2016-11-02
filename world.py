@@ -80,14 +80,16 @@ class Cell:
         currentState = self.mirrorCell.state
 
         # Rocks and Food never change.
-        if currentState in ['R', 'F']: return self
+        if currentState in ['R', 'F']:
+            self.state = currentState
+            return self
 
         # Precompute the neighborStates for performance.
         neighborStates = map(str, self.neighbors)
         counts = {item: neighborStates.count(item) for item in neighborStates}
 
-        # Ensure certain keys are mentionedso there's no missing key error later.
-        for key in ['F', 'R', 'E']:
+        # Ensure certain keys are mentioned so there's no missing key error later.
+        for key in ['F', 'R', 'E', currentState]:
             if not key in counts:
                 counts[key] = 0
 
@@ -100,9 +102,8 @@ class Cell:
         # Cell is born if:
         # friends + food = 3
 
-        #print "Neighbors: " + str(liveNeighbors)
-        #print "Food: " + str(counts['F'])
-
+        # print "Neighbors: " + str(liveNeighbors)
+        # print "Food: " + str(counts['F'])
 
         # print "Current state", currentState, currentState.isdigit()
         # print "Neighbors", liveNeighbors, liveNeighbors >= 4
@@ -113,7 +114,6 @@ class Cell:
 
         # See if a cell should be born.
         if currentState == 'E' and liveNeighbors in range(1, 4) and liveNeighbors + counts['F'] >=3:
-            print "Are we here"
             speciesCounts = {species: counts[species] for species in counts if species.isdigit()}
             self.state = max(speciesCounts.iteritems(), key=operator.itemgetter(1))[0]
         # Otherwise, see if it dies.
@@ -121,6 +121,8 @@ class Cell:
                 self.state = 'E'
         else:
             self.state = currentState
+
+        return self
 
     def __str__(self):
         return self.state
@@ -223,4 +225,10 @@ class World:
         return out
 
 if __name__ == '__main__':
-    pass
+
+    c = Cell('E', Cell('R'))
+
+    c.setSourceNeighbors([Cell('1'), Cell('1'), Cell('1'), Cell('R')])
+    c.updateValue()
+
+    assert 'R' == c.state

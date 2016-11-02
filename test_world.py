@@ -20,11 +20,12 @@ import world
     ('E', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('E')], '1'),
     ('1', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('1')], 'E'),
     ('1', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('F')], '1'),
-    ('1', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('R')], '1'),
+    ('R', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('R')], 'R'),
+    ('F', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('R')], 'F'),
 ])
 def test_update_value(start, neighbors, expected):
         # The state of the local cell doesn't matter, it's the mirror cell that matters.
-        c = world.Cell('E', world.Cell(start))
+        c = world.Cell(start, world.Cell(start))
 
         c.setSourceNeighbors(neighbors)
         c.updateValue()
@@ -97,6 +98,29 @@ def test_step():
     # Two cells should be born
     assert w.cellAt((1, 3)).state == '1'
     assert w.cellAt((3, 3)).state == '1'
+
+
+def test_step_with_food_and_rocks():
+    w = world.World(5, 10)
+    w.place('1', (2, 2)) \
+        .place('F', (2, 3)) \
+        .place('1', (2, 4)) \
+        .place('R', (3, 3))
+    w.step()
+
+    # Two cells should have died.
+    assert w.cellAt((2, 2)).state == 'E'
+    assert w.cellAt((2, 4)).state == 'E'
+
+    # Food cell doesn't change.
+    assert w.cellAt((2, 3)).state == 'F'
+
+    # Rock cell doesn't change.
+    assert w.cellAt((3, 3)).state == 'R'
+
+    # One cell should be born.
+    assert w.cellAt((1, 3)).state == '1'
+
 
 
 """
