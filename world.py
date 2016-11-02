@@ -97,7 +97,9 @@ class World(object):
     def __init__(self, rows, cols):
         self.rows = rows
         self.cols = cols
-        grid = self.newgrid(rows, cols)
+
+        # Initialize a rowsXcols grid of Cells with default values.
+        grid = {(x, y): Cell() for x in xrange(self.rows) for y in xrange(self.cols)}
 
         self.grid[0] = copy.deepcopy(grid)
         self.grid[1] = copy.deepcopy(grid)
@@ -154,14 +156,6 @@ class World(object):
 
         self.current = nextCurrent
         return
-
-    def newgrid(self, rows, cols):
-        grid = {}
-        # @todo There is probably a comprehension version of this.
-        for r in xrange(0, rows):
-            for c in xrange(0, cols):
-                grid[(r, c)] = Cell()
-        return grid
 
     def __str__(self):
         grid = self.activeGrid()
