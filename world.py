@@ -111,8 +111,7 @@ class World(object):
             cell.setSourceNeighbors(self.getCellNeighbors(target, (x, y)))
 
     def getCellNeighbors(self, target, coord):
-        x = coord[0]
-        y = coord[1]
+        x, y = coord
         x_range = range(max(x-1, 0), min(x+1, self.rows-1)+1)
         y_range = range(max(y-1, 0), min(y+1, self.cols-1)+1)
 
