@@ -139,10 +139,9 @@ class World(object):
         return self
 
     def step(self):
-        # @todo Turn this into a map call if possible.
-        for coord, cell in self.inactiveGrid.iteritems():
-            cell.updateValue()
-
+        # Update all cells in the inactive grid.
+        [cell.updateValue() for coord, cell in self.inactiveGrid.iteritems()]
+        # Now set that grid active.
         self.current = (self.current + 1) % 2
         return
 
