@@ -6,23 +6,37 @@ import world
 
 # Cell tests
 
-
 @pytest.mark.parametrize("start,neighbors,expected",  [
+    # Empty, 1 neighbor
     ('E', [world.Cell('1')], 'E'),
     ('E', [world.Cell('E')], 'E'),
-    ('E', [world.Cell('E'), world.Cell('1')], 'E'),
+    # Empty, 2 neighbors
     ('E', [world.Cell('E'), world.Cell('1')], 'E'),
     ('E', [world.Cell('1'), world.Cell('1')], 'E'),
-    ('E', [world.Cell('1'), world.Cell('1')], 'E'),
-    ('1', [world.Cell('1'), world.Cell('1')], '1'),
+    # Empty, 3 neighbors
     ('E', [world.Cell('1'), world.Cell('1'), world.Cell('1')], '1'),
     ('E', [world.Cell('1'), world.Cell('1'), world.Cell('F')], '1'),
-    ('E', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('E')], '1'),
-    ('1', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('1')], 'E'),
-    ('1', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('F')], '1'),
+    # Empty, 4 neighbors
+    ('E', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('E')], '1'), # Born from 3 neighbors
+    ('E', [world.Cell('1'), world.Cell('2'), world.Cell('1'), world.Cell('R')], 'E'), # Hostile neighbor prevents birth
+    # Living, 1 neighbor
+    ('1', [world.Cell('1')], 'E'),
+    # Living, 2 neighbors
+    ('1', [world.Cell('1'), world.Cell('1')], '1'),
+    ('1', [world.Cell('1'), world.Cell('F')], '1'),
+    # Living, 3 neighbors
+    ('1', [world.Cell('1'), world.Cell('1'), world.Cell('1')], '1'),
+    ('1', [world.Cell('1'), world.Cell('1'), world.Cell('F')], '1'),
+    ('1', [world.Cell('1'), world.Cell('1'), world.Cell('2')], '1'), # Still 2 friendly neighbors
+    # Living, 4 neighbors
+    ('1', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('1')], 'E'), # Die from over-population
+    ('1', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('F')], '1'), # Food doesn't cause over-population
+    # Rocks should always stay a rock
+    ('R', [], 'R'),
     ('R', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('R')], 'R'),
+    # Food should always stay food
+    ('F', [], 'F'),
     ('F', [world.Cell('1'), world.Cell('1'), world.Cell('1'), world.Cell('R')], 'F'),
-    ('E', [world.Cell('1'), world.Cell('2'), world.Cell('1'), world.Cell('R')], 'E'),
 ])
 def test_update_value(start, neighbors, expected):
         # The state of the local cell doesn't matter, it's the mirror cell that matters.
