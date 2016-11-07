@@ -5,6 +5,7 @@ from world import World, Cell
 
 # Cell tests
 
+
 @pytest.mark.parametrize("start,neighbors,expected",  [
     # Empty, 1 neighbor
     ('E', [Cell('1')], 'E'),
@@ -48,6 +49,7 @@ def test_update_value(start, neighbors, expected):
 
 
 # World tests
+
 
 def test_create_world():
     w = World(5, 10)
