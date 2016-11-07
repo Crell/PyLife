@@ -19,14 +19,17 @@ friends+food >=2
 Cell is born if:
 friends + food = 3
 
+@todo Create a coord named-tuple and use that instead of the anonymous coord tuples.
+
 """
+
 
 class Cell(object):
     neighbors = []
 
     def __init__(self, state = 'E', mirror = None):
         self._state = state
-        self.mirrorCell = mirror
+        self.mirror_cell = mirror
 
     @property
     def state(self):
@@ -37,21 +40,21 @@ class Cell(object):
         self._state = state
 
     @property
-    def mirrorCell(self):
+    def mirror_cell(self):
         return self._mirror_cell
 
-    @mirrorCell.setter
-    def mirrorCell(self, cell):
+    @mirror_cell.setter
+    def mirror_cell(self, cell):
         self._mirror_cell = cell
 
-    def setSourceNeighbors(self, cells):
+    def set_source_neighbors(self, cells):
         self.neighbors = cells
         return self
 
-    def updateValue(self):
+    def update_value(self):
         # The current state is actually the state of the mirror cell, since that determines
         # whether we may die or may be born.
-        currentState = self.mirrorCell.state
+        currentState = self.mirror_cell.state
 
         # Rocks and Food never change.
         if currentState in ['R', 'F']:
@@ -104,15 +107,15 @@ class World(object):
         self.grid[0] = copy.deepcopy(grid)
         self.grid[1] = copy.deepcopy(grid)
 
-        self.setGridSources(self.grid[0], self.grid[1])
-        self.setGridSources(self.grid[1], self.grid[0])
+        self.set_grid_sources(self.grid[0], self.grid[1])
+        self.set_grid_sources(self.grid[1], self.grid[0])
 
-    def setGridSources(self, grid, target):
+    def set_grid_sources(self, grid, target):
         for (x, y), cell, in grid.iteritems():
-            cell.mirrorCell = target[(x, y)]
-            cell.setSourceNeighbors(self.getCellNeighbors(target, (x, y)))
+            cell.mirror_cell = target[(x, y)]
+            cell.set_source_neighbors(self.get_cell_neighbors(target, (x, y)))
 
-    def getCellNeighbors(self, target, coord):
+    def get_cell_neighbors(self, target, coord):
         x, y = coord
         return [target[(i, j)]
                      for i in xrange(max(x-1, 0), min(x+1, self.rows-1)+1)
@@ -120,27 +123,27 @@ class World(object):
                      if not (i == x and j == y)]
 
     @property
-    def activeGrid(self):
+    def active_grid(self):
         return self.grid[self.current]
 
     @property
-    def inactiveGrid(self):
+    def inactive_grid(self):
         return self.grid[(self.current + 1) % 2]
 
-    def cellAt(self, coord):
-        return self.activeGrid[coord]
+    def cell_at(self, coord):
+        return self.active_grid[coord]
 
     def place(self, state, coord):
-        self.activeGrid[coord].state = state
+        self.active_grid[coord].state = state
         # Food and Rocks are persistent, so set them on both grids.
         if state in ['F', 'R']:
-            self.inactiveGrid[coord].state = state
+            self.inactive_grid[coord].state = state
 
         return self
 
     def step(self):
         # Update all cells in the inactive grid.
-        [cell.updateValue() for coord, cell in self.inactiveGrid.iteritems()]
+        [cell.update_value() for coord, cell in self.inactive_grid.iteritems()]
         # Now set that grid active.
         self.current = (self.current + 1) % 2
         return
@@ -150,7 +153,7 @@ class World(object):
         out += 'On grid {}:\n'.format(self.current)
         for x in xrange(self.rows):
             for y in xrange(self.cols):
-                out += str(self.activeGrid[(x, y)])
+                out += str(self.active_grid[(x, y)])
             out += '\n'
         return out
 
@@ -167,4 +170,4 @@ if __name__ == '__main__':
     print w
 
     # No one should be born.
-    assert w.cellAt((1, 3)).state == 'E'
+    assert w.cell_at((1, 3)).state == 'E'
