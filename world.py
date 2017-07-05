@@ -25,9 +25,18 @@ friends + food = 3
 
 
 class Cell(object):
+    """
+    A cell represents a single space in the grid.
+    """
     neighbors = []
 
     def __init__(self, state = 'E', mirror = None):
+        """
+        Construct a new Cell object.
+
+        :param state: The initial state of the cell.
+        :param mirror:  The mirror cell of this cell, from which it derives its start state for calculations.
+        """
         self._state = state
         self.mirror_cell = mirror
 
@@ -48,10 +57,21 @@ class Cell(object):
         self._mirror_cell = cell
 
     def set_source_neighbors(self, cells):
+        """
+        Sets the "neighboring" cells, from which this cell's next state will be derived.
+
+        :param cells: A List of cells.
+        :return: Self.
+        """
         self.neighbors = cells
         return self
 
     def update_value(self):
+        """
+        Updates this cell's value to the next generation, based on its neighbors.
+        :return: Self
+        """
+
         # The current state is actually the state of the mirror cell, since that determines
         # whether we may die or may be born.
         currentState = self.mirror_cell.state
@@ -116,6 +136,13 @@ class World(object):
             cell.set_source_neighbors(self.get_cell_neighbors(target, (x, y)))
 
     def get_cell_neighbors(self, target, coord):
+        """
+        Args:
+            target (List): The target grid from which to extract neighboring cells.
+            coord (tuple): An (x, y) tuple of the cell for which we want the list of neighbors.
+        Returns:
+            List: A List of cells that border the specified coordinate.
+        """
         x, y = coord
         return [target[(i, j)]
                      for i in xrange(max(x-1, 0), min(x+1, self.rows-1)+1)
